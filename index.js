@@ -21,6 +21,7 @@ async function run () {
         await client.connect();
         const serviceCollection = client.db('doctor_protals').collection('services');
         const bookingCollection = client.db('doctor_protals').collection('bookings');
+        const userCollection = client.db('doctor_protals').collection('users');
 
         app.get('/service', async(req, res) => {
             const query = {};
@@ -30,6 +31,17 @@ async function run () {
 
         });
 
+        app.put('/user/:email', async(req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = {email: email};
+            const options = {upsert: true};
+            const updateDoc = {
+              $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        })
 
          // Warning: This is not the proper way to query multiple collection. 
         // After learning more about mongodb. use aggregate, lookup, pipeline, match, group
