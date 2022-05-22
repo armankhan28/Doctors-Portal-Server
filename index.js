@@ -10,8 +10,21 @@ const port = process.env.PORT || 5000;
 
 
 //Middleware
-app.use(cors());
+const corsConfig = {
+  origin: true,
+  credentials: true,
+};
+app.use(cors(corsConfig));
+app.options("*", cors(corsConfig));
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header('Access-Control-Allow-Methods', 'DELETE, PUT, GET, POST');
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+  });
 app.use(express.json());
+
+
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.n0gan.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -187,7 +200,7 @@ async function run () {
           const result = await paymentCollection.insertOne(payment);
           const updatedBooking = await bookingCollection.updateOne(filter, updatedDoc);
           res.send(updatedBooking);
-        });
+        })
 
         app.get('/doctor', verifyJWT, verifyAdmin, async(req, res) =>{
           const doctors = await doctorCollection.find().toArray();
